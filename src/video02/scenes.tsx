@@ -69,7 +69,7 @@ export const TitleScene: React.FC = () => {
             منصة الدعم التعليمي المكثف
           </div>
           <RevealText text="من فجوة تعليمية…" delay={sec(1.2)} size={132} color={P.cream} />
-          <RevealText text="إلى إنجاز ملموس" delay={sec(3.8)} size={132} color={P.pink} />
+          <RevealText text="إلى إنجاز ملموس" delay={sec(3.5)} size={132} color={P.pink} />
           <div
             style={{
               width: 560 * line,
@@ -134,7 +134,7 @@ export const StagesScene: React.FC = () => {
           <Title size={54}>ست مراحل… رحلة واحدة</Title>
           <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 28, direction: "rtl"}}>
             {STAGES.map((s, i) => {
-              const p = reveal(frame, sec(0.9 + i * 0.7), 22);
+              const p = reveal(frame, sec(0.5 + i * 0.6), 22);
               return (
                 <div
                   key={s.n}
@@ -190,10 +190,10 @@ export const InterventionsScene: React.FC = () => {
   const frame = useCurrentFrame();
   const {frames} = getScene("interventions");
   const shots: ShotDef[] = [
-    {image: "interventions", f0: 0, f1: 0.6, y0: 0.05, y1: 0.8, z0: 1, z1: 1.04},
-    {image: "followUp", f0: 0.6, f1: 1, y0: 0, y1: 0.75, z0: 1.02, z1: 1},
+    {image: "interventions", f0: 0, f1: 0.667, y0: 0.05, y1: 0.8, z0: 1, z1: 1.04},
+    {image: "followUp", f0: 0.667, f1: 1, y0: 0, y1: 0.75, z0: 1.02, z1: 1},
   ];
-  const split = Math.round(frames * 0.6);
+  const split = Math.round(frames * 0.667);
   return (
     <SceneFade id="interventions">
       <CardStage shots={shots} frames={frames} />
@@ -273,10 +273,10 @@ export const ComparisonScene: React.FC = () => {
   const frame = useCurrentFrame();
   const {frames} = getScene("comparison");
   const shots: ShotDef[] = [
-    {image: "compare", f0: 0, f1: 0.55, y0: 0, y1: 0, z0: 1, z1: 1.1, fx: 0.5},
-    {image: "classBars", f0: 0.55, f1: 1, y0: 0, y1: 0, z0: 1, z1: 1.06},
+    {image: "compare", f0: 0, f1: 0.36, y0: 0, y1: 0, z0: 1, z1: 1.1, fx: 0.5},
+    {image: "classBars", f0: 0.36, f1: 1, y0: 0, y1: 0, z0: 1, z1: 1.06},
   ];
-  const split = Math.round(frames * 0.55);
+  const split = Math.round(frames * 0.36);
   const gain = useCount(sec(0.6), 50, 0, 26.5);
   const n19 = Math.round(useCount(sec(1.6), 36, 0, 19));
   const n46 = Math.round(useCount(sec(1.9), 36, 0, 46));
@@ -352,10 +352,10 @@ export const ImpactScene: React.FC = () => {
   const frame = useCurrentFrame();
   const {frames} = getScene("impact");
   const shots: ShotDef[] = [
-    {image: "impact1", f0: 0, f1: 0.5, y0: 0, y1: 1, z0: 1, z1: 1.03},
-    {image: "allImproved", f0: 0.5, f1: 1, y0: 0, y1: 0, z0: 1, z1: 1.08},
+    {image: "impact1", f0: 0, f1: 0.62, y0: 0, y1: 1, z0: 1, z1: 1.03},
+    {image: "allImproved", f0: 0.62, f1: 1, y0: 0, y1: 0, z0: 1, z1: 1.08},
   ];
-  const split = Math.round(frames * 0.5);
+  const split = Math.round(frames * 0.62);
   const big = reveal(frame, split + 4, 24);
   return (
     <SceneFade id="impact">
@@ -420,8 +420,8 @@ export const ClosingScene: React.FC = () => {
   const name = reveal(frame, 10, 36);
   const en = reveal(frame, 28, 30);
   const line = reveal(frame, 40, 30);
-  const tag = reveal(frame, sec(1.6), 28);
-  const credits = reveal(frame, sec(3), 28);
+  const tag = reveal(frame, sec(3.2), 28);
+  const credits = reveal(frame, sec(5), 28);
   const toDark = interpolate(frame, [frames - 36, frames], [0, 1], {extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: easeOut});
   return (
     <>
