@@ -1,0 +1,28 @@
+{
+  "name": "ai-cinematic-video-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cinematic Arabic (RTL) motion-graphics videos built with Remotion, React and TypeScript.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "remotion studio",
+    "typecheck": "tsc --noEmit",
+    "audio:voice": "python3 scripts/generate_voiceover.py",
+    "audio:music": "python3 scripts/generate_music.py",
+    "audio": "npm run audio:voice && npm run audio:music",
+    "render": "remotion render IntensiveSupport out/intensive-support-01.mp4",
+    "still": "remotion still IntensiveSupport out/poster.png --frame=240",
+    "check:privacy": "node scripts/check-privacy.mjs"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.0",
+    "@remotion/google-fonts": "^4.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "remotion": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "typescript": "^5.6.0"
+  }
+}

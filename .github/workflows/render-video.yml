@@ -1,0 +1,168 @@
+name: Render video (MP4 1080p)
+
+on:
+  # Manual run: GitHub → Actions → "Render video (MP4 1080p)" → Run workflow
+  workflow_dispatch:
+    inputs:
+      composition:
+        description: "Remotion composition id"
+        required: true
+        default: "IntensiveSupport"
+        type: string
+      voiceover:
+        description: "Arabic voiceover source"
+        required: true
+        default: "generate"
+        type: choice
+        options:
+          - generate     # free edge-tts voice, generated during the run
+          - recordings   # process your own files in content/voice-recordings/
+          - committed    # use whatever is already committed in public/audio/voice/
+          - none         # no narration, music only
+      voice:
+        description: "edge-tts voice (only used with voiceover = generate)"
+        required: true
+        default: "ar-SA-ZariyahNeural"
+        type: choice
+        options:
+          - ar-SA-ZariyahNeural
+          - ar-SA-HamedNeural
+          - ar-EG-SalmaNeural
+          - ar-AE-FatimaNeural
+  # Automatic run: whenever video sources change on main
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "content/**"
+      - "public/**"
+      - "scripts/**"
+      - "package.json"
+      - "remotion.config.ts"
+      - ".github/workflows/render-video.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: render-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      COMPOSITION: ${{ inputs.composition || 'IntensiveSupport' }}
+      VOICEOVER: ${{ inputs.voiceover || 'generate' }}
+      VOICE: ${{ inputs.voice || 'ar-SA-ZariyahNeural' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Privacy check (no student data or photos)
+        run: node scripts/check-privacy.mjs
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install system packages (ffmpeg + headless Chrome libraries)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg libnss3 libdbus-1-3 libatk1.0-0 libatk-bridge2.0-0 \
+            libxrandr2 libxkbcommon-dev libxfixes3 libxcomposite1 libxdamage1 \
+            libpango-1.0-0 libcairo2 libcups2 libgbm1 libxshmfence1
+          sudo apt-get install -y libasound2t64 || sudo apt-get install -y libasound2
+
+      - name: Install npm dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Install Python audio tools
+        run: pip install edge-tts numpy
+
+      - name: Make sure background music exists (original CC0 track)
+        run: |
+          if [ ! -f public/audio/music/background.mp3 ]; then
+            python scripts/generate_music.py
+          fi
+
+      - name: Voiceover — generate with edge-tts (free)
+        id: voice_generate
+        if: env.VOICEOVER == 'generate'
+        continue-on-error: true
+        run: python scripts/generate_voiceover.py --engine edge --voice "$VOICE"
+
+      - name: Voiceover — process my recordings
+        if: env.VOICEOVER == 'recordings'
+        run: python scripts/generate_voiceover.py --engine recordings
+
+      - name: Voiceover — disable (music only)
+        if: env.VOICEOVER == 'none'
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          p = pathlib.Path("public/audio/manifest.json")
+          m = json.loads(p.read_text(encoding="utf-8"))
+          m["voiceover"] = {"enabled": False, "engine": None, "voice": None, "scenes": {}}
+          p.write_text(json.dumps(m, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          PY
+
+      - name: Warn if voice generation failed
+        if: steps.voice_generate.outcome == 'failure'
+        run: |
+          echo "::warning title=Voiceover skipped::edge-tts could not generate the narration in this run. The video was rendered with music only. Re-run the workflow, or generate the voice locally and commit public/audio/voice/ with voiceover = committed."
+
+      - name: Show audio manifest
+        run: cat public/audio/manifest.json
+
+      - name: Render MP4 (1920x1080, H.264, AAC)
+        run: |
+          mkdir -p out
+          npx remotion render "$COMPOSITION" "out/$COMPOSITION.mp4" \
+            --codec=h264 --crf=18 --pixel-format=yuv420p --audio-codec=aac --log=info
+
+      - name: Render poster frame
+        run: npx remotion still "$COMPOSITION" out/poster.png --frame=240
+
+      - name: Verify output is 1080p
+        run: |
+          FILE="out/$COMPOSITION.mp4"
+          INFO=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height,r_frame_rate -show_entries format=duration -of default=nw=1 "$FILE")
+          echo "$INFO"
+          echo "$INFO" | grep -q "^width=1920$"  || { echo "::error::Width is not 1920"; exit 1; }
+          echo "$INFO" | grep -q "^height=1080$" || { echo "::error::Height is not 1080"; exit 1; }
+          ffprobe -v error -select_streams a -show_entries stream=codec_name -of csv=p=0 "$FILE" | grep -q . \
+            && echo "Audio track: present" || echo "::warning::No audio track found"
+          ls -lh out
+
+      - name: Upload video
+        uses: actions/upload-artifact@v4
+        with:
+          name: video-${{ github.run_number }}
+          path: |
+            out/*.mp4
+            out/poster.png
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Job summary
+        run: |
+          {
+            echo "### ✅ Video rendered"
+            echo ""
+            echo "- Composition: \`$COMPOSITION\` — 1920×1080, H.264 MP4"
+            echo "- Voiceover mode: \`$VOICEOVER\`"
+            echo "- Download: scroll to **Artifacts** at the bottom of this page → \`video-${{ github.run_number }}\` (ZIP containing the MP4 and a poster image). Kept for 30 days."
+          } >> "$GITHUB_STEP_SUMMARY"

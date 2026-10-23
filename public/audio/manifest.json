@@ -1,0 +1,13 @@
+{
+  "voiceover": {
+    "enabled": false,
+    "engine": null,
+    "voice": null,
+    "scenes": {}
+  },
+  "music": {
+    "enabled": true,
+    "file": "audio/music/background.mp3",
+    "license": "Original track synthesized by scripts/generate_music.py — CC0 / public domain"
+  }
+}

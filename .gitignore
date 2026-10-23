@@ -1,0 +1,19 @@
+# dependencies & build output
+node_modules/
+out/
+build/
+.remotion/
+__pycache__/
+*.pyc
+.env
+.env.*
+
+# --- Privacy: never commit student data or real photos to this public repo ---
+private/
+student-data/
+students/
+public/images/students/
+*.xlsx
+*.xls
+*.csv
+*.sav
