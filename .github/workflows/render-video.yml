@@ -72,7 +72,9 @@ jobs:
           python-version: "3.12"
 
       - name: Install system packages (ffmpeg + headless Chrome libraries)
+        timeout-minutes: 8
         run: |
+          echo 'Acquire::Retries "3"; Acquire::http::Timeout "20";' | sudo tee /etc/apt/apt.conf.d/99retries
           sudo apt-get update
           sudo apt-get install -y ffmpeg libnss3 libdbus-1-3 libatk1.0-0 libatk-bridge2.0-0 \
             libxrandr2 libxkbcommon-dev libxfixes3 libxcomposite1 libxdamage1 \
