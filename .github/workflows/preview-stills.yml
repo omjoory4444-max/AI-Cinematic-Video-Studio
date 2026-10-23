@@ -1,0 +1,72 @@
+name: Preview stills (video 02)
+
+# Renders one still per scene (JPEG) so the design can be reviewed BEFORE any MP4 export.
+on:
+  workflow_dispatch:
+  push:
+    branches: ["video-02/**"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  stills:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install system packages (ffmpeg + headless Chrome libraries)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg libnss3 libdbus-1-3 libatk1.0-0 libatk-bridge2.0-0 \
+            libxrandr2 libxkbcommon-dev libxfixes3 libxcomposite1 libxdamage1 \
+            libpango-1.0-0 libcairo2 libcups2 libgbm1 libxshmfence1
+          sudo apt-get install -y libasound2t64 || sudo apt-get install -y libasound2
+
+      - name: Install npm dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Render a still in the middle of every scene
+        run: |
+          mkdir -p out/stills
+          node -e '
+            const c = require("./content/video-02.json");
+            for (const s of c.scenes) {
+              const mid = Math.round(((s.start + s.end) / 2) * 30);
+              console.log(s.id + " " + mid);
+            }' > out/frames.txt
+          cat out/frames.txt
+          i=1
+          while read -r id frame; do
+            npx remotion still PlatformShowcase "out/stills/$(printf '%02d' $i)-$id.jpg" --frame="$frame" --image-format=jpeg --jpeg-quality=92
+            i=$((i+1))
+          done < out/frames.txt
+          ls -lh out/stills
+
+      - name: Contact sheet
+        run: |
+          ffmpeg -y -pattern_type glob -i 'out/stills/*.jpg' \
+            -vf "scale=640:-1,tile=2x4:padding=8:color=black" -frames:v 1 out/contact-sheet.jpg
+
+      - name: Upload stills
+        uses: actions/upload-artifact@v4
+        with:
+          name: video02-stills-${{ github.run_number }}
+          path: |
+            out/stills/*.jpg
+            out/contact-sheet.jpg
+          if-no-files-found: error
+          retention-days: 14

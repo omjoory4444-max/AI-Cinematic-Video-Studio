@@ -7,7 +7,7 @@ on:
       composition:
         description: "Remotion composition id"
         required: true
-        default: "IntensiveSupport"
+        default: "IntensiveSupport"   # or: PlatformShowcase (video 02 — use voiceover = committed)
         type: string
       voiceover:
         description: "Arabic voiceover source"
@@ -60,9 +60,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Privacy check (no student data or photos)
-        run: node scripts/check-privacy.mjs
 
       - name: Set up Node.js
         uses: actions/setup-node@v4

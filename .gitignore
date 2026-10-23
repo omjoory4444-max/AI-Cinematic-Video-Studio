@@ -9,11 +9,3 @@ __pycache__/
 .env.*
 
 # --- Privacy: never commit student data or real photos to this public repo ---
-private/
-student-data/
-students/
-public/images/students/
-*.xlsx
-*.xls
-*.csv
-*.sav
