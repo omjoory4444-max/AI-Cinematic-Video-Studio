@@ -74,7 +74,8 @@ jobs:
           echo "Preview stills generated from commit $GITHUB_SHA" > README.md
           git add -A
           git commit -q -m "Preview stills for $GITHUB_SHA"
-          git push -f origin HEAD:refs/heads/previews/video-02
+          for n in 1 2 3 4; do git -c http.postBuffer=524288000 push -f origin HEAD:refs/heads/previews/video-02 && break; sleep 10; done
+          git ls-remote --exit-code origin refs/heads/previews/video-02
           SH
           if ! bash /tmp/publish.sh > /tmp/publish.log 2>&1; then
             echo "::error::$(tail -n 12 /tmp/publish.log | tr '\n' ' | ')"
