@@ -4,11 +4,9 @@ name: Fetch narration (MP3)
 # onto the runner, analyses the pauses, and commits the MP3 to the branch.
 on:
   workflow_dispatch:
-    inputs:
-      url:
-        description: "Direct MP3 URL"
-        required: true
-        type: string
+  push:
+    branches: ["video-02/**"]
+    paths: [".github/narration-url.txt"]
 
 permissions:
   contents: write
@@ -21,9 +19,8 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Download MP3
-        env:
-          AUDIO_URL: ${{ inputs.url }}
         run: |
+          AUDIO_URL="$(cat .github/narration-url.txt)"
           mkdir -p public/audio/video-02
           curl -fsSL --retry 3 -o public/audio/video-02/narration.mp3 "$AUDIO_URL"
           ls -l public/audio/video-02/narration.mp3
@@ -39,6 +36,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -q --cached .github/narration-url.txt || true
           git add public/audio/video-02/narration.mp3 content/video-02-narration-analysis.txt
           git commit -m "Add approved narration (ElevenLabs Mona) + pause analysis"
           git push origin HEAD:${{ github.ref_name }}
