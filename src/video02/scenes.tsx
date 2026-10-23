@@ -353,7 +353,7 @@ export const ImpactScene: React.FC = () => {
   const {frames} = getScene("impact");
   const shots: ShotDef[] = [
     {image: "impact1", f0: 0, f1: 0.5, y0: 0, y1: 1, z0: 1, z1: 1.03},
-    {image: "allImproved", f0: 0.5, f1: 1, y0: 0.6, y1: 1, z0: 1, z1: 1},
+    {image: "allImproved", f0: 0.5, f1: 1, y0: 0, y1: 0, z0: 1, z1: 1.08},
   ];
   const split = Math.round(frames * 0.5);
   const big = reveal(frame, split + 4, 24);
@@ -396,7 +396,7 @@ export const JourneysScene: React.FC = () => {
   const {frames} = getScene("journeys");
   const shots: ShotDef[] = [
     {image: "progress", f0: 0, f1: 0.5, y0: 0, y1: 1, z0: 1, z1: 1.06},
-    {image: "roster1", f0: 0.5, f1: 1, y0: 0.35, y1: 0.7, z0: 1, z1: 1.04},
+    {image: "roster1", f0: 0.5, f1: 1, y0: 0.08, y1: 0.3, z0: 1, z1: 1.04},
   ];
   return (
     <SceneFade id="journeys">

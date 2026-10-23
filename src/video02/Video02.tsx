@@ -28,7 +28,11 @@ const SCENE_COMPONENTS: Record<SceneId, React.FC> = {
 
 const Subtitles: React.FC = () => {
   const frame = useCurrentFrame();
-  const active = CAPTIONS.find((c) => frame >= c.from && frame < c.to);
+  // The title and closing scenes already show the spoken words as large on-screen text.
+  const quiet = SCENES.filter((sc) => sc.id === "title" || sc.id === "closing").some(
+    (sc) => frame >= sc.from && frame < sc.from + sc.frames,
+  );
+  const active = quiet ? undefined : CAPTIONS.find((c) => frame >= c.from && frame < c.to);
   if (!active) {
     return null;
   }

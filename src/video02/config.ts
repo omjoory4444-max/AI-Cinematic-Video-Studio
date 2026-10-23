@@ -63,7 +63,7 @@ export const IMAGES = {
   progress: {file: "images/platform/p04-progress-chart.jpg", w: 1284, h: 1198},
   classBars: {file: "images/platform/p05-class-bars.jpg", w: 1284, h: 966},
   impact1: {file: "images/platform/p06-impact-1.jpg", w: 1284, h: 1702},
-  allImproved: {file: "images/platform/p07a-all-improved.jpg", w: 640, h: 1060},
+  allImproved: {file: "images/platform/p07a-all-improved.jpg", w: 610, h: 575},
   roster1: {file: "images/platform/p08-roster-1.jpg", w: 1284, h: 2117},
   followUp: {file: "images/platform/p10-follow-up.jpg", w: 1284, h: 2237},
 } as const;
