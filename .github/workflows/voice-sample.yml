@@ -1,0 +1,42 @@
+name: Voice samples (no video export)
+
+on:
+  workflow_dispatch:
+    inputs:
+      rate:
+        description: "Speaking rate (e.g. -8% = slower and calmer)"
+        required: true
+        default: "-8%"
+        type: string
+      pitch:
+        description: "Pitch offset (e.g. -2Hz)"
+        required: true
+        default: "-2Hz"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  samples:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install edge-tts
+        run: pip install edge-tts
+      - name: Generate samples
+        env:
+          RATE: ${{ inputs.rate }}
+          PITCH: ${{ inputs.pitch }}
+        run: python .github/voice-sample/make_samples.py
+      - name: Upload samples
+        uses: actions/upload-artifact@v4
+        with:
+          name: voice-samples
+          path: out/*.mp3
+          if-no-files-found: error
+          retention-days: 14
