@@ -72,7 +72,7 @@ jobs:
           git rm -rf --quiet --ignore-unmatch . 
           cp /tmp/pv/* .
           echo "Preview stills generated from commit $GITHUB_SHA" > README.md
-          git add -A
+          git add -- *.jpg README.md
           git commit -q -m "Preview stills for $GITHUB_SHA"
           for n in 1 2 3 4; do git -c http.postBuffer=524288000 push -f origin HEAD:refs/heads/previews/video-02 && break; sleep 10; done
           git ls-remote --exit-code origin refs/heads/previews/video-02
