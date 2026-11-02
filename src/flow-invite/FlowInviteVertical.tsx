@@ -569,7 +569,11 @@ const Studio: React.FC<{frame: number}> = ({frame}) => {
 const Ending: React.FC<{frame: number}> = ({frame}) => {
   if (frame < 630) return null;
   const bg = ip(frame, [630, 672], [0, 1]);
-  const logoP = ip(frame, [664, 700], [0, 1], ease);
+  const logoP = ip(frame, [664, 712], [0, 1], ease);
+  const scan = ip(frame, [664, 712], [-15, 115], easeIO); // light-scan reveal, left → right
+  const flareO = ip(frame, [664, 672, 704, 718], [0, 1, 1, 0]);
+  const spec = ip(frame, [740, 800], [-20, 120]);
+  const ringP = ip(frame, [700, 745], [0, 1], ease);
   const principalP = ip(frame, [752, 776], [0, 1], ease);
   const lineP = ip(frame, [855, 895], [0, 1], ease);
   const nameP = ip(frame, [912, 958], [0, 1], easeIO);
@@ -580,7 +584,7 @@ const Ending: React.FC<{frame: number}> = ({frame}) => {
     <AbsoluteFill style={{opacity: bg}}>
       <AbsoluteFill style={{background: `radial-gradient(ellipse at 50% 45%, #1C1530 0%, #0B0814 50%, ${C.ink} 100%)`}} />
       <AbsoluteFill style={{transform: `scale(${breathe})`, alignItems: "center"}}>
-        {/* school logo (transparent PNG) on a soft pool of light so its colours read on the dark stage */}
+        {/* school logo — cinematic reveal on the dark stage: halo ring, light-scan, gold flare */}
         <div
           style={{
             position: "absolute",
@@ -590,20 +594,87 @@ const Ending: React.FC<{frame: number}> = ({frame}) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            opacity: logoP,
-            transform: `translateY(${(1 - logoP) * 40}px) scale(${0.94 + logoP * 0.06})`,
           }}
         >
+          {/* soft coloured halo + expanding ring behind the logo */}
           <div
             style={{
               position: "absolute",
-              inset: "-170px -200px",
-              background: "radial-gradient(ellipse at 50% 52%, rgba(255,250,238,0.95) 0%, rgba(255,247,230,0.9) 30%, rgba(250,236,205,0.55) 46%, rgba(233,199,123,0.14) 60%, rgba(233,199,123,0) 70%)",
-              filter: "blur(18px)",
+              width: 980,
+              height: 760,
+              borderRadius: "50%",
+              background: "radial-gradient(ellipse at 50% 50%, rgba(70,120,220,0.30) 0%, rgba(92,225,255,0.10) 40%, rgba(0,0,0,0) 70%)",
+              opacity: ip(frame, [662, 700], [0, 1]),
             }}
           />
-          <Img src={staticFile("flow-invite/school-logo.png")} style={{position: "relative", width: 720}} />
-
+          <div
+            style={{
+              position: "absolute",
+              width: 300 + ringP * 700,
+              height: 300 + ringP * 700,
+              borderRadius: "50%",
+              border: `2px solid ${C.gold}`,
+              opacity: (1 - ringP) * 0.7 * (ringP > 0 ? 1 : 0),
+              boxShadow: `0 0 40px ${C.gold}`,
+            }}
+          />
+          {/* the logo: revealed by a scanning band of light, sharpening from blur */}
+          <div
+            style={{
+              position: "relative",
+              width: 760,
+              transform: `scale(${1.1 - logoP * 0.1})`,
+              filter: `blur(${(1 - logoP) * 12}px) drop-shadow(0 0 1.5px rgba(255,255,255,0.55)) drop-shadow(0 0 26px rgba(92,160,255,${0.25 + 0.15 * glow}))`,
+              WebkitMaskImage: `linear-gradient(90deg, #000 ${scan - 12}%, rgba(0,0,0,0) ${scan + 12}%)`,
+              maskImage: `linear-gradient(90deg, #000 ${scan - 12}%, rgba(0,0,0,0) ${scan + 12}%)`,
+            }}
+          >
+            <Img src={staticFile("flow-invite/school-logo-dark.png")} style={{width: "100%", display: "block"}} />
+            {/* specular sweep that only touches the logo's own pixels */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: `linear-gradient(105deg, rgba(255,255,255,0) ${spec - 12}%, rgba(255,248,225,0.95) ${spec}%, rgba(255,255,255,0) ${spec + 12}%)`,
+                WebkitMaskImage: `url(${staticFile("flow-invite/school-logo-dark.png")})`,
+                maskImage: `url(${staticFile("flow-invite/school-logo-dark.png")})`,
+                WebkitMaskSize: "100% 100%",
+                maskSize: "100% 100%",
+                mixBlendMode: "screen",
+              }}
+            />
+          </div>
+          {/* gold anamorphic flare riding the scan line */}
+          <div
+            style={{
+              position: "absolute",
+              left: `${5 + scan * 0.9}%`,
+              top: "50%",
+              width: 900,
+              height: 4,
+              marginLeft: -450,
+              marginTop: -2,
+              background: `linear-gradient(90deg, rgba(0,0,0,0), ${C.goldLight}, #fff, ${C.goldLight}, rgba(0,0,0,0))`,
+              filter: "blur(2px)",
+              opacity: flareO,
+              mixBlendMode: "screen",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              left: `${5 + scan * 0.9}%`,
+              top: "50%",
+              width: 160,
+              height: 160,
+              marginLeft: -80,
+              marginTop: -80,
+              borderRadius: "50%",
+              background: "radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,241,201,0.5) 25%, rgba(0,0,0,0) 70%)",
+              opacity: flareO,
+              mixBlendMode: "screen",
+            }}
+          />
         </div>
         {/* principal */}
         <div
@@ -651,7 +722,7 @@ const Ending: React.FC<{frame: number}> = ({frame}) => {
             style={{
               fontFamily: RUQAA,
               fontWeight: 700,
-              fontSize: 190,
+              fontSize: 150,
               lineHeight: 1.45,
               padding: "0 40px",
               marginTop: -20,
