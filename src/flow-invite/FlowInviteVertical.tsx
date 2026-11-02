@@ -399,40 +399,91 @@ const Icon: React.FC<{kind: "cal" | "clock" | "pin"}> = ({kind}) => (
   </svg>
 );
 
-const InfoPill: React.FC<{frame: number; at: number; icon: "cal" | "clock" | "pin"; text: string}> = ({frame, at, icon, text}) => {
-  const p = ip(frame, [at, at + 20], [0, 1], ease);
-  const sweep = ip(frame, [at + 6, at + 40], [-120, 220]);
-  return (
+/** Premium detail card: gold medallion icon, label + value, double gold hairline, corner ornaments. */
+const InfoCard: React.FC<{frame: number; at: number; icon: "cal" | "clock" | "pin"; label: string; text: string}> = ({frame, at, icon, label, text}) => {
+  const p = ip(frame, [at, at + 22], [0, 1], ease);
+  const ring = ip(frame, [at + 4, at + 30], [0, 1], ease);
+  const textP = ip(frame, [at + 8, at + 28], [0, 1], ease);
+  const sweep = ip(frame, [at + 10, at + 46], [-40, 140]);
+  const circ = 2 * Math.PI * 50;
+  const orn = (side: "left" | "right") => (
     <div
       style={{
+        position: "absolute",
+        top: "50%",
+        [side]: -7,
+        width: 12,
+        height: 12,
+        marginTop: -6,
+        transform: "rotate(45deg)",
+        background: C.ink,
+        border: `1.5px solid ${C.gold}`,
+        boxShadow: `0 0 10px ${C.gold}88`,
+      }}
+    />
+  );
+  return (
+    <div
+      dir="rtl"
+      style={{
+        position: "relative",
+        width: 820,
+        height: 156,
+        borderRadius: 30,
+        border: "1.5px solid transparent",
+        background: `linear-gradient(180deg, rgba(30,28,62,0.92), rgba(12,12,30,0.92)) padding-box, linear-gradient(115deg, ${C.goldDeep}, ${C.goldLight} 30%, ${C.goldDeep} 55%, ${C.gold} 80%, ${C.goldDeep}) border-box`,
+        boxShadow: `0 18px 50px rgba(0,0,0,0.55), 0 0 36px rgba(233,199,123,${0.12 + 0.08 * p}), inset 0 1px 0 rgba(255,241,201,0.18)`,
         opacity: p,
-        transform: `translateY(${(1 - p) * 40}px) scale(${0.92 + p * 0.08})`,
+        transform: `translateX(${(1 - p) * -70}px)`,
         filter: `blur(${(1 - p) * 8}px)`,
         display: "flex",
         alignItems: "center",
-        gap: 20,
-        padding: "24px 48px",
-        borderRadius: 999,
-        position: "relative",
-        overflow: "hidden",
-        background: "linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))",
-        border: `1.5px solid ${C.gold}99`,
-        boxShadow: `0 0 34px ${C.gold}22, inset 0 0 24px rgba(233,199,123,0.08)`,
+        padding: "0 34px",
+        gap: 28,
+        overflow: "visible",
       }}
     >
-      <Icon kind={icon} />
-      <span style={{fontFamily: MESSIRI, fontWeight: 600, fontSize: 58, color: C.ivory, lineHeight: 1.2}}>{text}</span>
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          bottom: 0,
-          width: 140,
-          left: `${sweep}%`,
-          background: "linear-gradient(90deg, transparent, rgba(255,241,201,0.35), transparent)",
-          transform: "skewX(-20deg)",
-        }}
-      />
+      {/* inner hairline */}
+      <div style={{position: "absolute", inset: 9, borderRadius: 22, border: "1px solid rgba(233,199,123,0.22)", pointerEvents: "none"}} />
+      {orn("left")}
+      {orn("right")}
+      {/* medallion */}
+      <div style={{position: "relative", width: 108, height: 108, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center"}}>
+        <div
+          style={{
+            position: "absolute",
+            inset: 6,
+            borderRadius: "50%",
+            background: "radial-gradient(circle at 35% 30%, rgba(255,241,201,0.22), rgba(233,199,123,0.05) 60%, rgba(0,0,0,0) 75%)",
+          }}
+        />
+        <svg width={108} height={108} style={{position: "absolute", inset: 0, transform: "rotate(-90deg)"}}>
+          <circle cx={54} cy={54} r={50} fill="none" stroke="rgba(233,199,123,0.18)" strokeWidth={2} />
+          <circle cx={54} cy={54} r={50} fill="none" stroke={C.gold} strokeWidth={2.5} strokeDasharray={circ} strokeDashoffset={circ * (1 - ring)} strokeLinecap="round" />
+        </svg>
+        <Icon kind={icon} />
+      </div>
+      {/* divider */}
+      <div style={{width: 1.5, height: 84, background: `linear-gradient(180deg, rgba(0,0,0,0), ${C.gold}, rgba(0,0,0,0))`, flexShrink: 0}} />
+      {/* label + value */}
+      <div style={{display: "flex", flexDirection: "column", alignItems: "flex-start", opacity: textP, transform: `translateY(${(1 - textP) * 12}px)`}}>
+        <span style={{fontFamily: MESSIRI, fontWeight: 400, fontSize: 34, color: C.gold, lineHeight: 1.15}}>{label}</span>
+        <span style={{fontFamily: MESSIRI, fontWeight: 700, fontSize: 60, color: C.ivory, lineHeight: 1.2, textShadow: "0 2px 18px rgba(0,0,0,0.5)"}}>{text}</span>
+      </div>
+      {/* light sweep */}
+      <div style={{position: "absolute", inset: 0, borderRadius: 30, overflow: "hidden", pointerEvents: "none"}}>
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            width: 160,
+            left: `${sweep}%`,
+            background: "linear-gradient(90deg, rgba(255,241,201,0), rgba(255,241,201,0.22), rgba(255,241,201,0))",
+            transform: "skewX(-20deg)",
+          }}
+        />
+      </div>
     </div>
   );
 };
@@ -552,11 +603,11 @@ const Studio: React.FC<{frame: number}> = ({frame}) => {
         </div>
       </AbsoluteFill>
       {/* details */}
-      <AbsoluteFill style={{alignItems: "center", justifyContent: "flex-start", paddingTop: 1150}}>
-        <div dir="rtl" style={{display: "flex", flexDirection: "column", gap: 30, alignItems: "center"}}>
-          <InfoPill frame={frame} at={447} icon="cal" text="الثلاثاء" />
-          <InfoPill frame={frame} at={484} icon="clock" text="الحصة الثانية" />
-          <InfoPill frame={frame} at={521} icon="pin" text="فصل اللغة الإنجليزية" />
+      <AbsoluteFill style={{alignItems: "center", justifyContent: "flex-start", paddingTop: 1120}}>
+        <div dir="rtl" style={{display: "flex", flexDirection: "column", gap: 34, alignItems: "center"}}>
+          <InfoCard frame={frame} at={445} icon="cal" label="اليوم" text="الثلاثاء" />
+          <InfoCard frame={frame} at={482} icon="clock" label="الوقت" text="الحصة الثانية" />
+          <InfoCard frame={frame} at={519} icon="pin" label="المكان" text="فصل اللغة الإنجليزية" />
         </div>
       </AbsoluteFill>
     </AbsoluteFill>
@@ -722,7 +773,7 @@ const Ending: React.FC<{frame: number}> = ({frame}) => {
             style={{
               fontFamily: RUQAA,
               fontWeight: 700,
-              fontSize: 150,
+              fontSize: 118,
               lineHeight: 1.45,
               padding: "0 40px",
               marginTop: -20,
