@@ -605,9 +605,9 @@ const Studio: React.FC<{frame: number}> = ({frame}) => {
       {/* details */}
       <AbsoluteFill style={{alignItems: "center", justifyContent: "flex-start", paddingTop: 1120}}>
         <div dir="rtl" style={{display: "flex", flexDirection: "column", gap: 34, alignItems: "center"}}>
-          <InfoCard frame={frame} at={445} icon="cal" label="اليوم" text="الثلاثاء" />
-          <InfoCard frame={frame} at={482} icon="clock" label="الوقت" text="الحصة الثانية" />
-          <InfoCard frame={frame} at={519} icon="pin" label="المكان" text="فصل اللغة الإنجليزية" />
+          <InfoCard frame={frame} at={445} icon="cal" label="اليوم" text="الأربعاء" />
+          <InfoCard frame={frame} at={488} icon="clock" label="الوقت" text="الحصة الثانية" />
+          <InfoCard frame={frame} at={530} icon="pin" label="المكان" text="فصل اللغة الإنجليزية" />
         </div>
       </AbsoluteFill>
     </AbsoluteFill>
