@@ -608,6 +608,18 @@ const Studio: React.FC<{frame: number}> = ({frame}) => {
           <InfoCard frame={frame} at={445} icon="cal" label="اليوم" text="الأربعاء" />
           <InfoCard frame={frame} at={488} icon="clock" label="الوقت" text="الحصة الثانية" />
           <InfoCard frame={frame} at={530} icon="pin" label="المكان" text="فصل اللغة الإنجليزية" />
+          {/* call to action, synced to the voiceover ("لا تفوّتي الفرصة... نراكِ هناك") */}
+          <div dir="rtl" lang="ar" style={{display: "flex", flexDirection: "column", alignItems: "center", marginTop: 14}}>
+            <div style={{fontFamily: MESSIRI, fontWeight: 600, fontSize: 52, color: C.gold, display: "flex", gap: 14, textShadow: "0 0 22px rgba(233,199,123,0.35)"}}>
+              <Word text="لا" frame={frame} at={584} />
+              <Word text="تفوّتي" frame={frame} at={589} />
+              <Word text="الفرصة" frame={frame} at={596} />
+            </div>
+            <div style={{fontFamily: MESSIRI, fontWeight: 700, fontSize: 68, color: C.ivory, display: "flex", gap: 16, textShadow: "0 2px 18px rgba(0,0,0,0.5)"}}>
+              <Word text="نراكِ" frame={frame} at={622} />
+              <Word text="هناك" frame={frame} at={629} />
+            </div>
+          </div>
         </div>
       </AbsoluteFill>
     </AbsoluteFill>
